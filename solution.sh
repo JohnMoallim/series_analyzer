@@ -9,6 +9,7 @@ main() {
     validate_first_entry "$@"
 
     while true; do
+        echo ""
         echo "a. Input a Series"
         echo "b. Display the series in the order it was entered"
         echo "c. Display the series in sorted order"
@@ -21,6 +22,7 @@ main() {
 
         read -r choice
 
+        echo ""
         #case start
         case "$choice" in
             a) input_series;;
@@ -106,12 +108,8 @@ display_min_value() {
 
 # Calculates and displays the average value of the series
 calculate_average_value() {
-    local sum=0
+    local sum=$(sum_series)
     local count=${#series[@]}
-
-    for num in "${series[@]}"; do
-        ((sum+=num))
-    done
 
     echo "scale=2; $sum / $count" | bc
 }
@@ -123,6 +121,16 @@ sort_series() {
     done | sort -n))
 }
 
+#Helper function to sum the series
+sum_series() {
+    local sum=0
+    for i in "${series[@]}"; do
+        ((sum += i));
+    done
+
+    echo $sum;
+}
+
 # Displays the number of elements in the series
 display_count() {
     num_of_elements=${#series[@]}
@@ -131,11 +139,7 @@ display_count() {
 
 # Calculates and displays the sum of the series
 display_sum() {
-    local sum=0
-    for i in "${series[@]}"; do
-        ((sum += i))
-    done
-    echo "The sum of the elements is: $sum"
+    echo "The sum of the elements is: $(sum_series)"
 }
 
 # Exit function to properly exit the program
