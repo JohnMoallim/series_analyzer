@@ -97,13 +97,13 @@ display_sorted_series(){
 # Displays the maximum value in the series
 display_max_value() {
     sort_series
-    echo ${sorted[-1]}
+    echo "Maximum value is: ${sorted[-1]}"
 }
 
 # Displays the minimum value in the series
 display_min_value() {
     sort_series
-    echo ${sorted[0]}
+    echo "Minimum value is: ${sorted[0]}"
 }
 
 # Calculates and displays the average value of the series
@@ -111,7 +111,9 @@ calculate_average_value() {
     local sum=$(sum_series)
     local count=${#series[@]}
 
-    echo "scale=2; $sum / $count" | bc
+    local average=$(echo "scale=2; $sum / $count" | bc)
+
+    echo "Average value is: $average"
 }
 
 # Helper function to sort the series
