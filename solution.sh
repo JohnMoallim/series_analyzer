@@ -9,7 +9,6 @@ main() {
     validate_first_entry "$@"
 
     while true; do
-        echo "working menu"
         echo "a. Input a Series"
         echo "b. Display the series in the order it was entered"
         echo "c. Display the series in sorted order"
@@ -144,4 +143,4 @@ exit_fun() {
     exit 0
 }
 
-main
+main "$@"
