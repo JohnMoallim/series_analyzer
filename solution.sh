@@ -2,29 +2,11 @@
 
 ## GLOBAL VARIABLES
 declare -a sorted
+declare -a series=()
 
-input_series() 
-{
-    local series=()
-    local num
-    echo "enter a positive number or 'done' to finish"
-    
-    while read -r num && [[ "$num" != "done" ]]; do
-        if [[ "$num" =~ ^[0-9]+$ && "$num" -gt 0 ]]; then
-            series+=("$num")
-        else
-            echo "invalid input"
-        fi
-    done
-    echo "${series[@]}"
-}
-
+# Main entry point of the script, handling menu and user interaction
 main() {
-    if [ $# -ge 3 ]; then
-        series=("$@")
-    else
-        series=$(input_series)
-    fi
+    validate_first_entry "$@"
 
     while true; do
         echo "working menu"
@@ -39,16 +21,18 @@ main() {
         echo "i. Exit"
 
         read -r choice
+
+        #case start
         case "$choice" in
-            a) series=$(input_series);;
-            b) display_series;;
+            a) input_series;;
+            b) display_series_in_entered_order;;
             c) display_sorted_series;;
-            d) display_max;;
-            e) display_min;;
-            f) display_average;;
+            d) display_max_value;;
+            e) display_min_value;;
+            f) calculate_average_value;;
             g) display_count;;
             h) display_sum;;
-            i) exit;;
+            i) exit_fun;;
             *) echo "invalid choice";;
         #end of case
         esac
@@ -56,8 +40,8 @@ main() {
 
 }
 
-#return 0 (true) only if the input is a number and is positive
-function validate() {
+# Validates if a given input is a positive number
+validate_numbers() {
 	local re='^[0-9]+$'
 	if ! [[ $1 =~ $re  ]]; then
 		return 1
@@ -68,10 +52,10 @@ function validate() {
 	return 0
 }	
 
-
-function validate_all(){
+# Validates all inputs to ensure they are positive numbers
+validate_all(){
 	for num in "$@"; do               
-		if validate "$num"; then
+		if validate_numbers "$num"; then
 			series+=("$num")
 		else
 			echo "Invalid arg: "$num""
@@ -81,44 +65,48 @@ function validate_all(){
 	return 0
 }
 
-#reads the input and sends each argument to validation, if 
-function input() {
+# Reads a series of positive numbers from the user
+input_series() {
 	series=()
 	echo "Enter a series of positive numbers (at least 3, sepearated by spaces)"
 	read -r -a series_input
-	validate_all $series_input || return 1
-	return 0
+	validate_all "${series_input[@]}" || return 1
 }
 
-#entry point, checks if the external arguments are 
-function main(){
+# Validates the first entry when the script is executed with arguments
+validate_first_entry(){
 	if [ $# -ge 3 ]; then
 		validate_all $@
 	else 
-		input 
+		input_series
 	fi
 }
 
-display_in_order(){
+# Displays the series in the order it was entered
+display_series_in_entered_order(){
     echo "The list in the order it was entered: ${series[@]}"
 }
 
-display_sorted(){
+# Sorts and then displays the series
+display_sorted_series(){
     sort_series
     echo "The sorted list is: ${sorted[*]}"
 }
 
-find_max_value() {
+# Displays the maximum value in the series
+display_max_value() {
     sort_series
     echo ${sorted[-1]}
 }
 
-find_min_value() {
+# Displays the minimum value in the series
+display_min_value() {
     sort_series
     echo ${sorted[0]}
 }
 
-calculate_average() {
+# Calculates and displays the average value of the series
+calculate_average_value() {
     local sum=0
     local count=${#series[@]}
 
@@ -129,19 +117,20 @@ calculate_average() {
     echo "scale=2; $sum / $count" | bc
 }
 
+# Helper function to sort the series
 sort_series() {
     sorted=($(for number in "${series[@]}"; do 
         echo "$number"; 
     done | sort -n))
 }
 
-# Prints the number of elements in the series.
+# Displays the number of elements in the series
 display_count() {
     num_of_elements=${#series[@]}
     echo "The number of elements is: $num_of_elements"
 }
 
-# Prints the sum of the numbers in the series.
+# Calculates and displays the sum of the series
 display_sum() {
     local sum=0
     for i in "${series[@]}"; do
@@ -150,8 +139,9 @@ display_sum() {
     echo "The sum of the elements is: $sum"
 }
 
-# Exit function, to exit the program proberly.
+# Exit function to properly exit the program
 exit_fun() {
     exit 0
 }
 
+main
